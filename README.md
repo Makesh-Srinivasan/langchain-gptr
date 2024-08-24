@@ -1,141 +1,326 @@
-# 🦜️🔗 LangChain
+# GPT-Researcher Tools for LangChain
 
-⚡ Build context-aware reasoning applications ⚡
+---
 
-[![Release Notes](https://img.shields.io/github/release/langchain-ai/langchain?style=flat-square)](https://github.com/langchain-ai/langchain/releases)
-[![CI](https://github.com/langchain-ai/langchain/actions/workflows/check_diffs.yml/badge.svg)](https://github.com/langchain-ai/langchain/actions/workflows/check_diffs.yml)
-[![PyPI - License](https://img.shields.io/pypi/l/langchain-core?style=flat-square)](https://opensource.org/licenses/MIT)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-core?style=flat-square)](https://pypistats.org/packages/langchain-core)
-[![GitHub star chart](https://img.shields.io/github/stars/langchain-ai/langchain?style=flat-square)](https://star-history.com/#langchain-ai/langchain)
-[![Open Issues](https://img.shields.io/github/issues-raw/langchain-ai/langchain?style=flat-square)](https://github.com/langchain-ai/langchain/issues)
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode&style=flat-square)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/langchain-ai/langchain)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/langchain-ai/langchain)
-[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/langchainai.svg?style=social&label=Follow%20%40LangChainAI)](https://twitter.com/langchainai)
+## Table of Contents
+- [Introduction](#introduction)
+  - [Key Features](#key-features)
+- [Installation and Setup](#installation-and-setup)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+- [Usage Examples](#usage-examples)
+  - [LocalGPTResearcher Example](#localgptresearcher-example)
+  - [WebGPTResearcher Example](#webgptresearcher-example)
+- [Chaining with Other Components and Agentic Systems](#chaining-with-other-components-and-agentic-systems)
+  - [Using AgentExecutor with WebGPTResearcher](#example-using-agentexecutor-with-webgptresearcher)
+  - [Simple Sequential Chaining of WebGPTResearcher](#simple-sequential-chaining-of-webgptresearcher)
+- [Building from Base Class](#building-from-base-class)
+  - [Extending BaseGPTResearcher](#extending-basegptresearcher)
+  - [Building CustomGPTResearcher](#building-customgptresearcher)
+  - [Off-the-Shelf Usage](#off-the-shelf-usage)
+- [Performance Considerations](#performance-considerations)
+- [Links and References](#links-and-references)
+- [Contribution Guide](#contribution-guide)
 
-Looking for the JS/TS library? Check out [LangChain.js](https://github.com/langchain-ai/langchainjs).
+---
 
-To help you ship LangChain apps to production faster, check out [LangSmith](https://smith.langchain.com).
-[LangSmith](https://smith.langchain.com) is a unified developer platform for building, testing, and monitoring LLM applications.
-Fill out [this form](https://www.langchain.com/contact-sales) to speak with our sales team.
+## Introduction
 
-## Quick Install
+The `LocalGPTResearcher` and `WebGPTResearcher` tools are designed to assist with conducting thorough research on specific topics or queries. These tools leverage the power of GPT models to generate detailed reports, making them ideal for various research-related tasks. The `LocalGPTResearcher` tool accesses local data files, while the `WebGPTResearcher` retrieves information from the web.
 
-With pip:
+### Key Features
+
+- 🔬 The `LocalGPTResearcher` can work with various local file formats such as PDF, Word documents, CSVs, and more.
+- 🛜 The `WebGPTResearcher` fetches data directly from the internet, making it suitable for up-to-date information gathering.
+- 📝 Generate research, outlines, resources and lessons reports with local documents and web sources
+- 📜 Can generate long and detailed research reports (over 2K words)
+- 🌐 Aggregates over 20 web sources per research to form objective and factual conclusions
+- 🖥️ Includes an easy-to-use web interface (HTML/CSS/JS)
+- 🔍 Scrapes web sources with javascript support
+- 📂 Keeps track and context of visited and used web sources
+- 📄 Export research reports to PDF, Word and more...
+
+---
+
+## Installation and Setup
+
+### Prerequisites
+Ensure you have Python 3 installed on your system.
+
+### Installation
+Install the necessary packages using pip:
 
 ```bash
-pip install langchain
+pip install gpt-researcher
 ```
 
-With conda:
+### Environment Variables
+For `LocalGPTResearcher`, you need to set the following environment variables:
 
 ```bash
-conda install langchain -c conda-forge
+export DOC_PATH=/path/to/your/documents
+export OPENAI_API_KEY=your-openai-api-key
+export TAVILY_API_KEY=your-tavily-api-key
 ```
 
-## 🤔 What is LangChain?
+For `WebGPTResearcher`, only the `OPENAI_API_KEY` and `TAVILY_API_KEY` are required:
 
-**LangChain** is a framework for developing applications powered by large language models (LLMs).
+```bash
+export OPENAI_API_KEY=your-openai-api-key
+export TAVILY_API_KEY=your-tavily-api-key
+```
 
-For these applications, LangChain simplifies the entire application lifecycle:
+---
 
-- **Open-source libraries**: Build your applications using LangChain's open-source [building blocks](https://python.langchain.com/v0.2/docs/concepts#langchain-expression-language-lcel), [components](https://python.langchain.com/v0.2/docs/concepts), and [third-party integrations](https://python.langchain.com/v0.2/docs/integrations/platforms/).
-  Use [LangGraph](/docs/concepts/#langgraph) to build stateful agents with first-class streaming and human-in-the-loop support.
-- **Productionization**: Inspect, monitor, and evaluate your apps with [LangSmith](https://docs.smith.langchain.com/) so that you can constantly optimize and deploy with confidence.
-- **Deployment**: Turn your LangGraph applications into production-ready APIs and Assistants with [LangGraph Cloud](https://langchain-ai.github.io/langgraph/cloud/).
+## Usage Examples
 
-### Open-source libraries
+### LocalGPTResearcher Example
+This example demonstrates how to use `LocalGPTResearcher` to generate a report based on local documents.
 
-- **`langchain-core`**: Base abstractions and LangChain Expression Language.
-- **`langchain-community`**: Third party integrations.
-  - Some integrations have been further split into **partner packages** that only rely on **`langchain-core`**. Examples include **`langchain_openai`** and **`langchain_anthropic`**.
-- **`langchain`**: Chains, agents, and retrieval strategies that make up an application's cognitive architecture.
-- **[`LangGraph`](https://langchain-ai.github.io/langgraph/)**: A library for building robust and stateful multi-actor applications with LLMs by modeling steps as edges and nodes in a graph. Integrates smoothly with LangChain, but can be used without it.
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import LocalGPTResearcher  # This will be changed after successful PR
 
-### Productionization:
+# Initialize the tool
+researcher_local = LocalGPTResearcher(report_type="research_report")
+# You can also define it as `researcher_local = LocalGPTResearcher()` - default report_type is research_report.
 
-- **[LangSmith](https://docs.smith.langchain.com/)**: A developer platform that lets you debug, test, evaluate, and monitor chains built on any LLM framework and seamlessly integrates with LangChain.
+# Run a query
+query = "What is the demographics of Apple inc look like?"
+report = researcher_local.invoke({"query":query})
 
-### Deployment:
+print("Generated Report:", report)
+```
 
-- **[LangGraph Cloud](https://langchain-ai.github.io/langgraph/cloud/)**: Turn your LangGraph applications into production-ready APIs and Assistants.
+### WebGPTResearcher Example
+This example shows how to use `WebGPTResearcher` to generate a report based on web data.
 
-![Diagram outlining the hierarchical organization of the LangChain framework, displaying the interconnected parts across multiple layers.](docs/static/svg/langchain_stack_062024.svg "LangChain Architecture Overview")
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher  # This will be changed after successful PR
 
-## 🧱 What can you build with LangChain?
+# Initialize the tool
+researcher_web = WebGPTResearcher(report_type="research_report") # report_type="research_report" is optional as the default value is `research_report`
 
-**❓ Question answering with RAG**
+# Run a query
+query = "What are the latest advancements in AI?"
+report = researcher_web.invoke({"query":query})
 
-- [Documentation](https://python.langchain.com/v0.2/docs/tutorials/rag/)
-- End-to-end Example: [Chat LangChain](https://chat.langchain.com) and [repo](https://github.com/langchain-ai/chat-langchain)
+print("Generated Report:", report)
+```
 
-**🧱 Extracting structured output**
+---
 
-- [Documentation](https://python.langchain.com/v0.2/docs/tutorials/extraction/)
-- End-to-end Example: [SQL Llama2 Template](https://github.com/langchain-ai/langchain-extract/)
+## Chaining with Other Components and Agentic Systems
 
-**🤖 Chatbots**
+### Example: Using `AgentExecutor` with `WebGPTResearcher`
 
-- [Documentation](https://python.langchain.com/v0.2/docs/tutorials/chatbot/)
-- End-to-end Example: [Web LangChain (web researcher chatbot)](https://weblangchain.vercel.app) and [repo](https://github.com/langchain-ai/weblangchain)
+Let us see how to build an AgentExecutor wrapper that uses an LLM and our tool to write an essay and provide a citation/signature at the end of the report.
 
-And much more! Head to the [Tutorials](https://python.langchain.com/v0.2/docs/tutorials/) section of the docs for more.
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher  # This will be changed after successful PR
 
-## 🚀 How does LangChain help?
+from langchain import hub
+from langchain_core.tools import Tool
+from langchain.agents import AgentExecutor, create_react_agent
+from langchain.tools import tool
+from langchain_openai import ChatOpenAI
 
-The main value props of the LangChain libraries are:
 
-1. **Components**: composable building blocks, tools and integrations for working with language models. Components are modular and easy-to-use, whether you are using the rest of the LangChain framework or not
-2. **Off-the-shelf chains**: built-in assemblages of components for accomplishing higher-level tasks
+# Let us see how to use the WebGPTResearcher tool along with AgentExecutor to perform a grand task with decision making.
+# 1. Let us build a Reactive Agent who takes decisions based on reasoning.
+# 2. Let us give our agent 2 tools - WebGPTResearcher and a dummy tool that provides a signature at the end of the text
+# 3. We can then wrap our agent and tools inside an AgentExecutor object and ask our question!
+# The expectation is the response must be signed at the end after a long report on a research topic.
 
-Off-the-shelf chains make it easy to get started. Components make it easy to customize existing chains and build new ones.
 
-## LangChain Expression Language (LCEL)
+# Create a new tool called citation_provider.
+@tool
+def citation_provider(text: str) -> int:
+    """Provides a citation or signature"""
+    return "\n- Written by GPT-Makesh\nThanks for reading!\n"
 
-LCEL is a key part of LangChain, allowing you to build and organize chains of processes in a straightforward, declarative manner. It was designed to support taking prototypes directly into production without needing to alter any code. This means you can use LCEL to set up everything from basic "prompt + LLM" setups to intricate, multi-step workflows.
 
-- **[Overview](https://python.langchain.com/v0.2/docs/concepts/#langchain-expression-language-lcel)**: LCEL and its benefits
-- **[Interface](https://python.langchain.com/v0.2/docs/concepts/#runnable-interface)**: The standard Runnable interface for LCEL objects
-- **[Primitives](https://python.langchain.com/v0.2/docs/how_to/#langchain-expression-language-lcel)**: More on the primitives LCEL includes
-- **[Cheatsheet](https://python.langchain.com/v0.2/docs/how_to/lcel_cheatsheet/)**: Quick overview of the most common usage patterns
+# Create the WebGPTResearcher tool
+researcher_web = WebGPTResearcher("research_report")
 
-## Components
+# Initialize tools and components
+tools = [
+    researcher_web,
+    Tool(
+        name = "citation_tool",  
+        func = citation_provider,  
+        description = "Useful for when you need to add citation or signature at the end of text",
+    ),
+]
 
-Components fall into the following **modules**:
+# Create an LLM
+llm = ChatOpenAI(model="gpt-4o")
+prompt = hub.pull("hwchase17/react")
 
-**📃 Model I/O**
+# Create the ReAct agent using the create_react_agent function
+agent = create_react_agent(
+    llm=llm,
+    tools=tools,
+    prompt=prompt,
+    stop_sequence=True,
+)
 
-This includes [prompt management](https://python.langchain.com/v0.2/docs/concepts/#prompt-templates), [prompt optimization](https://python.langchain.com/v0.2/docs/concepts/#example-selectors), a generic interface for [chat models](https://python.langchain.com/v0.2/docs/concepts/#chat-models) and [LLMs](https://python.langchain.com/v0.2/docs/concepts/#llms), and common utilities for working with [model outputs](https://python.langchain.com/v0.2/docs/concepts/#output-parsers).
+# Wrap the components inside an AgentExecutor
+agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True)
 
-**📚 Retrieval**
+# Run the agent
+question = "What are the recent advancements in AI? Provide a citation for your report too."
+response = agent_executor.invoke({"input": question})
+print("Agent Response:", response)
+```
 
-Retrieval Augmented Generation involves [loading data](https://python.langchain.com/v0.2/docs/concepts/#document-loaders) from a variety of sources, [preparing it](https://python.langchain.com/v0.2/docs/concepts/#text-splitters), then [searching over (a.k.a. retrieving from)](https://python.langchain.com/v0.2/docs/concepts/#retrievers) it for use in the generation step.
+### Example: Simple Sequential Chaining of `WebGPTResearcher`
 
-**🤖 Agents**
+Let us build a chain of runnables that have a researcher who writes a report and a grader who then grades and scores the report.
 
-Agents allow an LLM autonomy over how a task is accomplished. Agents make decisions about which Actions to take, then take that Action, observe the result, and repeat until the task is complete. LangChain provides a [standard interface for agents](https://python.langchain.com/v0.2/docs/concepts/#agents), along with [LangGraph](https://github.com/langchain-ai/langgraph) for building custom agents.
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher
 
-## 📖 Documentation
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnableLambda
+from langchain_openai import ChatOpenAI
 
-Please see [here](https://python.langchain.com) for full documentation, which includes:
+# Let us use WebGPTResearcher to grade the essay using LECL langchain Chaining tricks
+# 1. Use the researcher to write an essay
+# 2. Pass it as a chat_prompt_template (a runnable) to a grader to score the essay
+# 3. Parse the output as a string
 
-- [Introduction](https://python.langchain.com/v0.2/docs/introduction/): Overview of the framework and the structure of the docs.
-- [Tutorials](https://python.langchain.com/docs/use_cases/): If you're looking to build something specific or are more of a hands-on learner, check out our tutorials. This is the best place to get started.
-- [How-to guides](https://python.langchain.com/v0.2/docs/how_to/): Answers to “How do I….?” type questions. These guides are goal-oriented and concrete; they're meant to help you complete a specific task.
-- [Conceptual guide](https://python.langchain.com/v0.2/docs/concepts/): Conceptual explanations of the key parts of the framework.
-- [API Reference](https://api.python.langchain.com): Thorough documentation of every class and method.
 
-## 🌐 Ecosystem
+# Create a ChatOpenAI model
+grader = ChatOpenAI(model="gpt-4o")
+researcher_tool = WebGPTResearcher()
+prompt_template = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a essay grader. Give score out of 10 in brief"),
+        ("human", "The essay: {essay}"),
+    ]
+)
 
-- [🦜🛠️ LangSmith](https://docs.smith.langchain.com/): Trace and evaluate your language model applications and intelligent agents to help you move from prototype to production.
-- [🦜🕸️ LangGraph](https://langchain-ai.github.io/langgraph/): Create stateful, multi-actor applications with LLMs. Integrates smoothly with LangChain, but can be used without it.
-- [🦜🏓 LangServe](https://python.langchain.com/docs/langserve): Deploy LangChain runnables and chains as REST APIs.
+# Define our WebGPTResearcher tool as a RunnableLambda
+researcher = RunnableLambda(lambda x: researcher_tool.invoke(x))
 
-## 💁 Contributing
+# Create the combined chain using LangChain Expression Language (LCEL)
+chain = researcher | prompt_template | grader | StrOutputParser() 
 
-As an open-source project in a rapidly developing field, we are extremely open to contributions, whether it be in the form of a new feature, improved infrastructure, or better documentation.
+# Run the chain
+result = chain.invoke({"query": "What are the recent advancements in AI?"})
 
-For detailed information on how to contribute, see [here](https://python.langchain.com/v0.2/docs/contributing/).
+# Output
+print(result)
+```
 
-## 🌟 Contributors
+---
 
-[![langchain contributors](https://contrib.rocks/image?repo=langchain-ai/langchain&max=2000)](https://github.com/langchain-ai/langchain/graphs/contributors)
+## Building from Base Class
+
+### Extending `BaseGPTResearcher`
+
+You can create custom tools by extending the `BaseGPTResearcher` class. Here's an example:
+
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher
+
+class CustomGPTResearcher(BaseGPTResearcher):
+    name = ""
+    description = ""  
+    def __init__(self, report_type: ReportType = ReportType.RESEARCH):
+        super().__init__(report_type=report_type, report_source="web")
+
+    # Override or extend methods as needed (You need to implement `_run()` method, `_arun()` is optional)
+```
+API reference: (GPT Researcher tool)[link]
+
+### Building CustomGPTResearcher
+
+You can define a custom GPTR tool as shown below:
+
+```python
+import asyncio
+from typing import Optional, Type
+
+from langchain_core.callbacks import CallbackManagerForToolRun
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_core.tools import BaseTool
+from gpt_researcher import GPTResearcher
+
+
+class GPTRInput(BaseModel):
+    """Input schema for the GPT-Researcher tool."""
+    query: str = Field(description="The search query for the research")
+
+class MyGPTResearcher(BaseTool):
+    name: str = "custom_gpt_researcher"
+    description: str = "Base tool for researching and producing detailed information about a topic or query using the internet."
+    args_schema: Type[BaseModel] = GPTRInput
+
+    async def get_report(self, query: str) -> str:
+        try:
+            researcher = GPTResearcher(
+                query=query,
+                report_type="research_report",
+                report_source="web",
+                verbose=False
+            )
+            await researcher.conduct_research()
+            report = await researcher.write_report()
+            return report
+        except Exception as e:
+            raise ValueError(f"Error generating report: {str(e)}")
+
+    def _run(
+            self, 
+            query: str, 
+            run_manager: Optional[CallbackManagerForToolRun] = None
+        ) -> str:
+        answer = asyncio.run(self.get_report(query=query))
+        answer += "\n\n- By GPT-Makesh.\nThanks for reading!"
+        return answer
+
+my_researcher = MyGPTResearcher()
+report = my_researcher.invoke({"query": "What are the recent advancements in AI?"})
+print(report)
+```
+
+### Off-the-Shelf Usage
+
+Alternatively, you can directly use the provided tools without modification off-the-shelf.
+
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher, LocalGPTResearcher
+
+# Use LocalGPTResearcher
+researcher_local = LocalGPTResearcher(report_type="research_report")
+report = researcher_local.invoke({'query':"What can you tell about the company?"})
+
+# Use WebGPTResearcher
+researcher_web = WebGPTResearcher(report_type="research_report")
+report = researcher_web.invoke({'query':"What are the latest advancements in AI?"})
+```
+
+---
+
+## Performance Considerations
+
+- **Time and Cost Estimates:** The tools are optimized for performance and cost, using models like `gpt-4o-mini` and `gpt-4o` (128K context) only when necessary. The average research task takes about 3 minutes and costs approximately $0.005.
+- **Usage Limitations:** Be aware of potential limitations such as maximum query length and data size when working with large local datasets or complex web queries.
+
+---
+
+## Links and References
+
+- **GPT-Researcher Documentation:** For a comprehensive guide, visit [GPT-Researcher Documentation](https://docs.gptr.dev/docs/gpt-researcher/introduction).
+- **GitHub Repository:** Explore the code and contribute at [GPT-Researcher on GitHub](https://github.com/assafelovic/gpt-researcher).
+
+---
+
+## Contribution Guide
+
+We welcome contributions to improve and extend the GPT-Researcher tools. Visit the [GitHub repository](https://github.com/assafelovic/gpt-researcher) to get started with contributing.
+
+---
