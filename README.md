@@ -112,7 +112,7 @@ print("Generated Report:", report)
 
 ### HybridGPTResearcher Example
 
-**Note** : (Yet to be pushed into pip)
+> **Note** : (Yet to be pushed into pip)
 
 This example demonstrates how to use `HybridGPTResearcher` to generate a report based on local documents AND the internet.
 
@@ -333,7 +333,7 @@ researcher_hybrid = HybridGPTResearcher(report_type="research_report")
 report = researcher_hybrid.invoke({'query':"What are the latest advancements in AI?"})
 ```
 
-**Note** : (`HybridGPTResearcher` is yet to be pushed into pip. You can alternatively clone the repository to test its functionality)
+> **Note** : (`HybridGPTResearcher` is yet to be pushed into pip. You can alternatively clone the repository to test its functionality)
 
 ---
 
