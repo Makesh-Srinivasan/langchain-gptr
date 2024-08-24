@@ -12,6 +12,7 @@
 - [Usage Examples](#usage-examples)
   - [LocalGPTResearcher Example](#localgptresearcher-example)
   - [WebGPTResearcher Example](#webgptresearcher-example)
+  - [HybridGPTResearcher Example](#hybridgptresearcher-example)
 - [Chaining with Other Components and Agentic Systems](#chaining-with-other-components-and-agentic-systems)
   - [Using AgentExecutor with WebGPTResearcher](#example-using-agentexecutor-with-webgptresearcher)
   - [Simple Sequential Chaining of WebGPTResearcher](#simple-sequential-chaining-of-webgptresearcher)
@@ -27,12 +28,13 @@
 
 ## Introduction
 
-The `LocalGPTResearcher` and `WebGPTResearcher` tools are designed to assist with conducting thorough research on specific topics or queries. These tools leverage the power of GPT models to generate detailed reports, making them ideal for various research-related tasks. The `LocalGPTResearcher` tool accesses local data files, while the `WebGPTResearcher` retrieves information from the web.
+The `LocalGPTResearcher`, `WebGPTResearcher` and `HybridGPTResearcher` tools are designed to assist with conducting thorough research on specific topics or queries. These tools leverage the power of GPT models to generate detailed reports, making them ideal for various research-related tasks. The `LocalGPTResearcher` tool accesses local data files, while the `WebGPTResearcher` retrieves information from the web. The `HybridGPTResearcher` does both to answer your research questions!
 
 ### Key Features
 
 - 🔬 The `LocalGPTResearcher` can work with various local file formats such as PDF, Word documents, CSVs, and more.
 - 🛜 The `WebGPTResearcher` fetches data directly from the internet, making it suitable for up-to-date information gathering.
+- 🔬🛜 The `HybridGPTResearcher` does them both!
 - 📝 Generate research, outlines, resources and lessons reports with local documents and web sources
 - 📜 Can generate long and detailed research reports (over 2K words)
 - 🌐 Aggregates over 20 web sources per research to form objective and factual conclusions
@@ -56,7 +58,7 @@ pip install gpt-researcher
 ```
 
 ### Environment Variables
-For `LocalGPTResearcher`, you need to set the following environment variables:
+For `LocalGPTResearcher` and `HybridGPTResearcher`, you need to set the following environment variables:
 
 ```bash
 export DOC_PATH=/path/to/your/documents
@@ -104,6 +106,26 @@ researcher_web = WebGPTResearcher(report_type="research_report") # report_type="
 # Run a query
 query = "What are the latest advancements in AI?"
 report = researcher_web.invoke({"query":query})
+
+print("Generated Report:", report)
+```
+
+### HybridGPTResearcher Example
+
+**Note** : (Yet to be pushed into pip)
+
+This example demonstrates how to use `HybridGPTResearcher` to generate a report based on local documents AND the internet.
+
+```python
+from libs.community.langchain_community.tools.gpt_researcher.tool import HybridGPTResearcher  # This will be changed after successful PR
+
+# Initialize the tool
+researcher_hybrid = HybridGPTResearcher(report_type="research_report")
+# You can also define it as `researcher_local = LocalGPTResearcher()` - default report_type is research_report.
+
+# Run a query
+query = "What is the demographics of Apple inc look like?"
+report = researcher_hybrid.invoke({"query":query})
 
 print("Generated Report:", report)
 ```
@@ -174,6 +196,8 @@ response = agent_executor.invoke({"input": question})
 print("Agent Response:", response)
 ```
 
+Follow the same steps to implement the same with `LocalGPTResearcher` and `HybridGPTResearcher`. Just make sure to export `DOC_PATH`.
+
 ### Example: Simple Sequential Chaining of `WebGPTResearcher`
 
 Let us build a chain of runnables that have a researcher who writes a report and a grader who then grades and scores the report.
@@ -214,6 +238,8 @@ result = chain.invoke({"query": "What are the recent advancements in AI?"})
 # Output
 print(result)
 ```
+
+Follow the same steps to implement the same with `LocalGPTResearcher` and `HybridGPTResearcher`. Just make sure to export `DOC_PATH`.
 
 ---
 
@@ -292,7 +318,7 @@ print(report)
 Alternatively, you can directly use the provided tools without modification off-the-shelf.
 
 ```python
-from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher, LocalGPTResearcher
+from libs.community.langchain_community.tools.gpt_researcher.tool import WebGPTResearcher, LocalGPTResearcher, HybridGPTResearcher
 
 # Use LocalGPTResearcher
 researcher_local = LocalGPTResearcher(report_type="research_report")
@@ -301,7 +327,13 @@ report = researcher_local.invoke({'query':"What can you tell about the company?"
 # Use WebGPTResearcher
 researcher_web = WebGPTResearcher(report_type="research_report")
 report = researcher_web.invoke({'query':"What are the latest advancements in AI?"})
+
+# Use HybridGPTResearcher
+researcher_hybrid = HybridGPTResearcher(report_type="research_report")
+report = researcher_hybrid.invoke({'query':"What are the latest advancements in AI?"})
 ```
+
+**Note** : (`HybridGPTResearcher` is yet to be pushed into pip. You can alternatively clone the repository to test its functionality)
 
 ---
 
